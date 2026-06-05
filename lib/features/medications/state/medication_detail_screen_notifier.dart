@@ -5,7 +5,6 @@ import 'package:med_sync/features/auth/state/auth_providers.dart';
 import 'package:med_sync/features/medications/models/medication.dart';
 import 'package:med_sync/features/medications/models/medication_detail_state.dart';
 import 'package:med_sync/features/medications/models/medication_failure.dart';
-import 'package:med_sync/features/medications/state/medication_form_validator.dart';
 import 'package:med_sync/features/medications/state/medication_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -50,15 +49,6 @@ class MedicationDetailScreenNotifier
 
   Future<bool> saveEdit(MedicationFormInput input) async {
     if (!state.hasValue) return false;
-    final validation = MedicationFormValidator.validate(input);
-    if (!validation.isValid) {
-      state = AsyncData(
-        state.requireValue.copyWith(
-          actionFailure: MedicationFailures.validation(validation.fieldErrors),
-        ),
-      );
-      return false;
-    }
 
     return _submit(() async {
       final ownerUid = _currentUserUid();

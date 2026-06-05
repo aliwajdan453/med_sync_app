@@ -37,6 +37,11 @@ class MedicationDetailScreen extends ConsumerWidget {
     return BaseScaffold(
       appBar: BaseAppBar(
         title: 'Medication',
+        leading: BackButton(
+          onPressed: () => navigator.canPop()
+              ? navigator.pop()
+              : navigator.go(MedicationsListScreen.routePath),
+        ),
         trailing: notifierState.whenOrNull(
           data: (state) => IconButton(
             tooltip: state.isEditing ? 'Cancel edit' : 'Edit',

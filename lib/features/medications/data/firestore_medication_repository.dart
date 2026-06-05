@@ -18,10 +18,6 @@ class FirestoreMedicationRepository implements MedicationRepository {
   CollectionReference<Json> _collection(String ownerUid) =>
       _firestore.collection('users').doc(ownerUid).collection('medications');
 
-  // ---------------------------------------------------------------------------
-  // Reads
-  // ---------------------------------------------------------------------------
-
   @override
   Stream<List<Medication>> watchActiveMedications(String ownerUid) =>
       _collection(ownerUid)
@@ -30,7 +26,9 @@ class FirestoreMedicationRepository implements MedicationRepository {
           .map(
             (snapshot) => sortMedicationsNewestFirst(
               snapshot.docs
-                  .map((doc) => Medication.fromJson({'id': doc.id, ...doc.data()}))
+                  .map(
+                    (doc) => Medication.fromJson({'id': doc.id, ...doc.data()}),
+                  )
                   .toList(growable: false),
             ),
           );
@@ -39,17 +37,13 @@ class FirestoreMedicationRepository implements MedicationRepository {
   Stream<Medication?> watchMedication({
     required String ownerUid,
     required String medicationId,
-  }) =>
-      _collection(ownerUid).doc(medicationId).snapshots().map((snapshot) {
-        final data = snapshot.data();
-        return data == null
-            ? null
-            : Medication.fromJson({'id': snapshot.id, ...data});
-      });
+  }) => _collection(ownerUid).doc(medicationId).snapshots().map((snapshot) {
+    final data = snapshot.data();
 
-  // ---------------------------------------------------------------------------
-  // Writes
-  // ---------------------------------------------------------------------------
+    return data == null
+        ? null
+        : Medication.fromJson({'id': snapshot.id, ...data});
+  });
 
   @override
   Future<Medication> createMedication({
@@ -67,12 +61,15 @@ class FirestoreMedicationRepository implements MedicationRepository {
         updatedAt: now,
       );
 
-      _logger.info('Creating medication.', context: {
-        'ownerUid': ownerUid,
-        'medicationId': doc.id,
-        'routineType': input.routineType.name,
-        'category': input.category.name,
-      });
+      _logger.info(
+        'Creating medication.',
+        context: {
+          'ownerUid': ownerUid,
+          'medicationId': doc.id,
+          'routineType': input.routineType.name,
+          'category': input.category.name,
+        },
+      );
 
       await doc.set(medication.toJson());
 
@@ -80,10 +77,18 @@ class FirestoreMedicationRepository implements MedicationRepository {
     } on BaseFailure {
       rethrow;
     } on Object catch (error, stackTrace) {
-      _logger.error('Medication create failed.',
-          error: error, stackTrace: stackTrace,
-          context: {'ownerUid': ownerUid});
-      throw AppFailureMapper.map(error, stackTrace: stackTrace, logger: _logger);
+      _logger.error(
+        'Medication create failed.',
+        error: error,
+        stackTrace: stackTrace,
+        context: {'ownerUid': ownerUid},
+      );
+
+      throw AppFailureMapper.map(
+        error,
+        stackTrace: stackTrace,
+        logger: _logger,
+      );
     }
   }
 
@@ -107,21 +112,29 @@ class FirestoreMedicationRepository implements MedicationRepository {
         updatedAt: DateTime.now(),
       ).copyWith(status: current.status, archivedAt: current.archivedAt);
 
-      _logger.info('Updating medication.', context: {
-        'ownerUid': ownerUid,
-        'medicationId': medicationId,
-      });
+      _logger.info(
+        'Updating medication.',
+        context: {'ownerUid': ownerUid, 'medicationId': medicationId},
+      );
 
-      await _collection(ownerUid)
-          .doc(medicationId)
-          .set(updated.toJson(), SetOptions(merge: true));
+      await _collection(
+        ownerUid,
+      ).doc(medicationId).set(updated.toJson(), SetOptions(merge: true));
     } on BaseFailure {
       rethrow;
     } on Object catch (error, stackTrace) {
-      _logger.error('Medication update failed.',
-          error: error, stackTrace: stackTrace,
-          context: {'ownerUid': ownerUid, 'medicationId': medicationId});
-      throw AppFailureMapper.map(error, stackTrace: stackTrace, logger: _logger);
+      _logger.error(
+        'Medication update failed.',
+        error: error,
+        stackTrace: stackTrace,
+        context: {'ownerUid': ownerUid, 'medicationId': medicationId},
+      );
+
+      throw AppFailureMapper.map(
+        error,
+        stackTrace: stackTrace,
+        logger: _logger,
+      );
     }
   }
 
@@ -131,10 +144,10 @@ class FirestoreMedicationRepository implements MedicationRepository {
     required String medicationId,
   }) async {
     try {
-      _logger.info('Archiving medication.', context: {
-        'ownerUid': ownerUid,
-        'medicationId': medicationId,
-      });
+      _logger.info(
+        'Archiving medication.',
+        context: {'ownerUid': ownerUid, 'medicationId': medicationId},
+      );
 
       await _collection(ownerUid).doc(medicationId).set(<String, Object?>{
         'status': MedicationStatus.archived.name,
@@ -142,10 +155,18 @@ class FirestoreMedicationRepository implements MedicationRepository {
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
     } on Object catch (error, stackTrace) {
-      _logger.error('Medication archive failed.',
-          error: error, stackTrace: stackTrace,
-          context: {'ownerUid': ownerUid, 'medicationId': medicationId});
-      throw AppFailureMapper.map(error, stackTrace: stackTrace, logger: _logger);
+      _logger.error(
+        'Medication archive failed.',
+        error: error,
+        stackTrace: stackTrace,
+        context: {'ownerUid': ownerUid, 'medicationId': medicationId},
+      );
+
+      throw AppFailureMapper.map(
+        error,
+        stackTrace: stackTrace,
+        logger: _logger,
+      );
     }
   }
 
@@ -155,23 +176,27 @@ class FirestoreMedicationRepository implements MedicationRepository {
     required String medicationId,
   }) async {
     try {
-      _logger.warning('Permanently deleting medication.', context: {
-        'ownerUid': ownerUid,
-        'medicationId': medicationId,
-      });
+      _logger.warning(
+        'Permanently deleting medication.',
+        context: {'ownerUid': ownerUid, 'medicationId': medicationId},
+      );
 
       await _collection(ownerUid).doc(medicationId).delete();
     } on Object catch (error, stackTrace) {
-      _logger.error('Medication delete failed.',
-          error: error, stackTrace: stackTrace,
-          context: {'ownerUid': ownerUid, 'medicationId': medicationId});
-      throw AppFailureMapper.map(error, stackTrace: stackTrace, logger: _logger);
+      _logger.error(
+        'Medication delete failed.',
+        error: error,
+        stackTrace: stackTrace,
+        context: {'ownerUid': ownerUid, 'medicationId': medicationId},
+      );
+
+      throw AppFailureMapper.map(
+        error,
+        stackTrace: stackTrace,
+        logger: _logger,
+      );
     }
   }
-
-  // ---------------------------------------------------------------------------
-  // Helpers
-  // ---------------------------------------------------------------------------
 
   Medication _fromInput({
     required String id,
@@ -199,6 +224,5 @@ class FirestoreMedicationRepository implements MedicationRepository {
 }
 
 List<Medication> sortMedicationsNewestFirst(List<Medication> medications) =>
-    ([...medications]..sort(
-        (left, right) => right.createdAt.compareTo(left.createdAt),
-      ));
+    ([...medications]
+      ..sort((left, right) => right.createdAt.compareTo(left.createdAt)));

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:med_sync/core/widgets/app_text_field.dart';
 import 'package:med_sync/features/medications/models/medication.dart';
 
 class MedicationDoseFields extends StatelessWidget {
@@ -23,12 +24,10 @@ class MedicationDoseFields extends StatelessWidget {
       Row(
         children: [
           Expanded(
-            child: TextField(
+            child: AppTextField(
+              label: 'Dose Amount',
               controller: doseAmountController,
-              decoration: InputDecoration(
-                labelText: 'Dose Amount',
-                errorText: errors['doseAmount'],
-              ),
+              errorText: errors['doseAmount'],
               keyboardType: TextInputType.number,
             ),
           ),
@@ -55,12 +54,10 @@ class MedicationDoseFields extends StatelessWidget {
       ),
       if (doseUnit == 'custom') ...[
         const SizedBox(height: 16),
-        TextField(
+        AppTextField(
+          label: 'Custom unit',
           controller: customDoseUnitController,
-          decoration: InputDecoration(
-            labelText: 'Custom unit',
-            errorText: errors['doseUnit'],
-          ),
+          errorText: errors['doseUnit'],
         ),
       ],
     ],

@@ -15,15 +15,14 @@ abstract final class MedicationFormValidator {
     final doseUnit = _resolvedDoseUnit(input);
     final instructions = input.instructions.trim();
 
-    if (name.isEmpty) {
-      errors['name'] = 'Enter a medication name.';
-    }
+    if (name.isEmpty) errors['name'] = 'Enter a medication name.';
+
     if (input.doseAmount == null || input.doseAmount! <= 0) {
       errors['doseAmount'] = 'Enter a dose amount.';
     }
-    if (doseUnit.isEmpty) {
-      errors['doseUnit'] = 'Choose a dose unit.';
-    }
+
+    if (doseUnit.isEmpty) errors['doseUnit'] = 'Choose a dose unit.';
+
     if (instructions.isEmpty) {
       errors['instructions'] = 'Enter routine instructions.';
     }
@@ -63,24 +62,24 @@ abstract final class MedicationFormValidator {
     RefillInfo? refillInfo,
     Map<String, String> errors,
   ) {
-    if (refillInfo == null) {
-      return;
-    }
+    if (refillInfo == null) return;
+
     if (refillInfo.currentQuantity <= 0) {
       errors['currentQuantity'] = 'Enter a quantity greater than zero.';
     }
+
     if (refillInfo.doseQuantity <= 0) {
       errors['doseQuantity'] = 'Enter a dose quantity greater than zero.';
     }
+
     if (refillInfo.reminderThreshold <= 0) {
       errors['reminderThreshold'] = 'Enter a threshold greater than zero.';
     }
   }
 
   static String _resolvedDoseUnit(MedicationFormInput input) {
-    if (input.doseUnit == 'custom') {
-      return input.customDoseUnit.trim();
-    }
+    if (input.doseUnit == 'custom') return input.customDoseUnit.trim();
+
     return input.doseUnit.trim();
   }
 }

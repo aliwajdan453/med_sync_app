@@ -5,7 +5,6 @@ import 'package:med_sync/features/auth/state/auth_providers.dart';
 import 'package:med_sync/features/medications/models/medication.dart';
 import 'package:med_sync/features/medications/models/medication_failure.dart';
 import 'package:med_sync/features/medications/models/medication_form_state.dart';
-import 'package:med_sync/features/medications/state/medication_form_validator.dart';
 import 'package:med_sync/features/medications/state/medication_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -21,14 +20,6 @@ class AddMedicationController extends _$AddMedicationController {
   }
 
   Future<String?> save(MedicationFormInput input) async {
-    final validation = MedicationFormValidator.validate(input);
-    if (!validation.isValid) {
-      state = state.copyWith(
-        failure: MedicationFailures.validation(validation.fieldErrors),
-      );
-      return null;
-    }
-
     state = state.copyWith(isSubmitting: true, failure: null);
 
     try {

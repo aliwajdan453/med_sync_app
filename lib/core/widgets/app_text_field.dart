@@ -14,6 +14,7 @@ class AppTextField extends StatefulWidget {
     this.autofillHints,
     this.obscureText = false,
     this.enabled = true,
+    this.maxLines = 1,
     this.onSubmitted,
     this.validator,
   });
@@ -29,6 +30,7 @@ class AppTextField extends StatefulWidget {
   final Iterable<String>? autofillHints;
   final bool obscureText;
   final bool enabled;
+  final int? maxLines;
   final ValueChanged<String>? onSubmitted;
   final FormFieldValidator<String>? validator;
 
@@ -64,6 +66,7 @@ class _AppTextFieldState extends State<AppTextField> {
         autofillHints: widget.autofillHints,
         obscureText: _obscureText,
         enabled: widget.enabled,
+        maxLines: widget.obscureText ? 1 : widget.maxLines,
         onFieldSubmitted: widget.onSubmitted,
         validator: widget.validator,
         decoration: InputDecoration(

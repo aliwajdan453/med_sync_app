@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:med_sync/core/widgets/app_error_banner.dart';
+import 'package:med_sync/core/widgets/app_primary_button.dart';
+import 'package:med_sync/core/widgets/app_text_field.dart';
 import 'package:med_sync/features/medications/models/medication.dart';
 import 'package:med_sync/features/medications/models/medication_form_state.dart';
+import 'package:med_sync/features/medications/state/medication_form_validator.dart';
 import 'package:med_sync/features/medications/widgets/medication_dose_fields.dart';
 import 'package:med_sync/features/medications/widgets/medication_refill_fields.dart';
 import 'package:med_sync/features/medications/widgets/medication_schedule_fields.dart';
@@ -30,6 +33,7 @@ class _MedicationFormState extends State<MedicationForm> {
   late final TextEditingController _currentQuantityController;
   late final TextEditingController _doseQuantityController;
   late final TextEditingController _thresholdController;
+
   var _category = MedicationCategory.prescription;
   var _routineType = MedicationRoutineType.scheduled;
   var _doseUnit = 'mg';
@@ -37,6 +41,7 @@ class _MedicationFormState extends State<MedicationForm> {
   var _weekdays = <int>{};
   var _time = const MedicationTime(hour: 8, minute: 0);
   var _refillEnabled = false;
+  var _errors = const <String, String>{};
 
   @override
   void initState() {
@@ -90,7 +95,7 @@ class _MedicationFormState extends State<MedicationForm> {
 
   @override
   Widget build(BuildContext context) {
-    final errors = widget.state.fieldErrors;
+    final errors = _errors;
 
     return ListView(
       padding: const EdgeInsets.all(24),
@@ -102,12 +107,10 @@ class _MedicationFormState extends State<MedicationForm> {
           stackTrace: widget.state.failure?.stackTrace,
         ),
         const SizedBox(height: 16),
-        TextField(
+        AppTextField(
+          label: 'Medication Name',
           controller: _nameController,
-          decoration: InputDecoration(
-            labelText: 'Medication Name',
-            errorText: errors['name'],
-          ),
+          errorText: errors['name'],
           textInputAction: TextInputAction.next,
         ),
         const SizedBox(height: 16),
@@ -152,13 +155,10 @@ class _MedicationFormState extends State<MedicationForm> {
           onDoseUnitChanged: (value) => setState(() => _doseUnit = value),
         ),
         const SizedBox(height: 16),
-        TextField(
+        AppTextField(
+          label: 'Routine Instructions',
           controller: _instructionsController,
-          decoration: InputDecoration(
-            labelText: 'Routine Instructions',
-            errorText: errors['instructions'],
-          ),
-          minLines: 2,
+          errorText: errors['instructions'],
           maxLines: 4,
         ),
         if (_routineType == MedicationRoutineType.scheduled) ...[
@@ -184,11 +184,10 @@ class _MedicationFormState extends State<MedicationForm> {
           onEnabledChanged: (value) => setState(() => _refillEnabled = value),
         ),
         const SizedBox(height: 24),
-        FilledButton(
-          onPressed: widget.state.isSubmitting ? null : _submit,
-          child: Text(
-            widget.state.isSubmitting ? 'Saving...' : 'Save medication',
-          ),
+        AppPrimaryButton(
+          label: 'Save medication',
+          isLoading: widget.state.isSubmitting,
+          onPressed: _submit,
         ),
       ],
     );
@@ -203,27 +202,34 @@ class _MedicationFormState extends State<MedicationForm> {
           )
         : null;
 
-    widget.onSubmit(
-      MedicationFormInput(
-        name: _nameController.text,
-        category: _category,
-        routineType: _routineType,
-        doseAmount: _parseNumber(_doseAmountController.text),
-        doseUnit: _doseUnit,
-        customDoseUnit: _customDoseUnitController.text,
-        instructions: _instructionsController.text,
-        schedule: _routineType == MedicationRoutineType.scheduled
-            ? MedicationSchedule(
-                pattern: _schedulePattern,
-                weekdays: _schedulePattern == MedicationSchedulePattern.weekdays
-                    ? (_weekdays.toList()..sort())
-                    : const <int>[],
-                times: <MedicationTime>[_time],
-              )
-            : null,
-        refillInfo: refillInfo,
-      ),
+    final input = MedicationFormInput(
+      name: _nameController.text,
+      category: _category,
+      routineType: _routineType,
+      doseAmount: _parseNumber(_doseAmountController.text),
+      doseUnit: _doseUnit,
+      customDoseUnit: _customDoseUnitController.text,
+      instructions: _instructionsController.text,
+      schedule: _routineType == MedicationRoutineType.scheduled
+          ? MedicationSchedule(
+              pattern: _schedulePattern,
+              weekdays: _schedulePattern == MedicationSchedulePattern.weekdays
+                  ? (_weekdays.toList()..sort())
+                  : const <int>[],
+              times: <MedicationTime>[_time],
+            )
+          : null,
+      refillInfo: refillInfo,
     );
+
+    final validation = MedicationFormValidator.validate(input);
+    if (!validation.isValid) {
+      setState(() => _errors = validation.fieldErrors);
+      return;
+    }
+
+    setState(() => _errors = const {});
+    widget.onSubmit(input);
   }
 }
 

@@ -35,41 +35,6 @@ void main() {
     expect(repository.created.single.name, 'Vitamin D');
   });
 
-  test('save returns null and sets failure when validation fails', () async {
-    final container = ProviderContainer(
-      overrides: [
-        currentUserProvider.overrideWith((ref) => Stream.value(FakeUser())),
-        authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
-        medicationRepositoryProvider.overrideWithValue(
-          FakeMedicationRepository(),
-        ),
-      ],
-    );
-    addTearDown(container.dispose);
-    container.listen(addMedicationControllerProvider, (_, _) {});
-
-    const invalidInput = MedicationFormInput(
-      name: '',
-      category: MedicationCategory.supplement,
-      routineType: MedicationRoutineType.scheduled,
-      doseAmount: null,
-      doseUnit: '',
-      customDoseUnit: '',
-      instructions: '',
-      schedule: null,
-      refillInfo: null,
-    );
-
-    final result = await container
-        .read(addMedicationControllerProvider.notifier)
-        .save(invalidInput);
-
-    expect(result, isNull);
-    final state = container.read(addMedicationControllerProvider);
-    expect(state.failure, isNotNull);
-    expect(state.fieldErrors['name'], 'Enter a medication name.');
-  });
-
   test('save captures failure and logs when repository throws', () async {
     final repository = FakeMedicationRepository(
       error: Exception('firestore-down'),

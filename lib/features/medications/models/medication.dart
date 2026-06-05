@@ -25,6 +25,7 @@ abstract class MedicationTime with _$MedicationTime {
   String get label {
     final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
     final suffix = hour >= 12 ? 'PM' : 'AM';
+
     return '$displayHour:${minute.toString().padLeft(2, '0')} $suffix';
   }
 }

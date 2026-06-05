@@ -31,25 +31,22 @@ class MedicationsListScreen extends ConsumerWidget {
       child: AppAsyncValueWidget<List<Medication>>(
         value: medications,
         onRetry: () => ref.invalidate(medicationListProvider),
-        data: (context, value) {
-          if (value.isEmpty) {
-            return _EmptyMedicationList(
-              onAdd: () => navigator.push(AddMedicationScreen.routePath),
-            );
-          }
-          return ListView.separated(
-            padding: const EdgeInsets.all(24.0),
-            itemCount: value.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 12.0),
-            itemBuilder: (_, i) => _MedicationCard(
-              medication: value[i],
-              onTap: () => navigator.goNamed(
-                MedicationDetailScreen.routeName,
-                pathParameters: {'medicationId': value[i].id},
+        data: (context, value) => value.isEmpty
+            ? _EmptyMedicationList(
+                onAdd: () => navigator.push(AddMedicationScreen.routePath),
+              )
+            : ListView.separated(
+                padding: const EdgeInsets.all(24.0),
+                itemCount: value.length,
+                separatorBuilder: (_, _) => const SizedBox(height: 12.0),
+                itemBuilder: (_, i) => _MedicationCard(
+                  medication: value[i],
+                  onTap: () => navigator.pushNamed(
+                    MedicationDetailScreen.routeName,
+                    pathParameters: {'medicationId': value[i].id},
+                  ),
+                ),
               ),
-            ),
-          );
-        },
       ),
     );
   }
@@ -130,10 +127,12 @@ String _subtitle(Medication medication) {
   final routine = medication.routineType == MedicationRoutineType.scheduled
       ? 'Scheduled'
       : 'As needed';
+
   return '$routine • ${_formatNumber(medication.doseAmount)} ${medication.doseUnit}';
 }
 
 String _formatNumber(double value) {
   if (value == value.roundToDouble()) return value.toInt().toString();
+
   return value.toString();
 }

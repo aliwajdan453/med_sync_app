@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:med_sync/core/widgets/app_text_field.dart';
 
 class MedicationRefillFields extends StatelessWidget {
   const MedicationRefillFields({
@@ -29,30 +30,24 @@ class MedicationRefillFields extends StatelessWidget {
       ),
       if (enabled) ...[
         const SizedBox(height: 12),
-        TextField(
+        AppTextField(
+          label: 'Remaining Supply',
           controller: currentQuantityController,
-          decoration: InputDecoration(
-            labelText: 'Remaining Supply',
-            errorText: errors['currentQuantity'],
-          ),
+          errorText: errors['currentQuantity'],
           keyboardType: TextInputType.number,
         ),
         const SizedBox(height: 12),
-        TextField(
+        AppTextField(
+          label: 'Dose Quantity',
           controller: doseQuantityController,
-          decoration: InputDecoration(
-            labelText: 'Dose Quantity',
-            errorText: errors['doseQuantity'],
-          ),
+          errorText: errors['doseQuantity'],
           keyboardType: TextInputType.number,
         ),
         const SizedBox(height: 12),
-        TextField(
+        AppTextField(
+          label: 'Reminder Threshold',
           controller: thresholdController,
-          decoration: InputDecoration(
-            labelText: 'Reminder Threshold',
-            errorText: errors['reminderThreshold'],
-          ),
+          errorText: errors['reminderThreshold'],
           keyboardType: TextInputType.number,
         ),
       ],

@@ -5,14 +5,9 @@ part '../../../generated/features/medications/models/medication_form_state.freez
 
 @freezed
 abstract class MedicationFormState with _$MedicationFormState {
-  const MedicationFormState._();
-
   const factory MedicationFormState({
     @Default(false) bool isSubmitting,
     BaseFailure? failure,
     @Default(false) bool didCompleteDelete,
   }) = _MedicationFormState;
-
-  Map<String, String> get fieldErrors =>
-      failure?.fieldErrors ?? const <String, String>{};
 }

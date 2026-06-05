@@ -64,8 +64,6 @@ class FirestoreProfileRepository implements ProfileRepository {
     try {
       final value = displayName.trim();
       await user.updateDisplayName(value);
-      await user.reload();
-
       final existing = await fetchProfile(user.uid);
       final now = DateTime.now();
       final profile =

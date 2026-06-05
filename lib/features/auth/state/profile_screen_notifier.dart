@@ -27,7 +27,10 @@ class ProfileScreenNotifier extends _$ProfileScreenNotifier {
 
     ref.onDispose(() {
       _nameController?.dispose();
+      _nameController = null;
       _nameFocus?.dispose();
+      _nameFocus = null;
+      _formKey = null;
       _loadedUid = null;
     });
 

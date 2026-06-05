@@ -9,7 +9,7 @@ import 'package:med_sync/core/widgets/app_error_banner.dart';
 import 'package:med_sync/features/medications/models/medication.dart';
 import 'package:med_sync/features/medications/models/medication_detail_state.dart';
 import 'package:med_sync/features/medications/models/medication_form_state.dart';
-import 'package:med_sync/features/medications/state/medication_controllers.dart';
+import 'package:med_sync/features/medications/state/medication_detail_screen_notifier.dart';
 import 'package:med_sync/features/medications/views/medications_list_screen.dart';
 import 'package:med_sync/features/medications/widgets/medication_form.dart';
 

@@ -4,7 +4,7 @@ import 'package:med_sync/core/design_system/base_app_bar.dart';
 import 'package:med_sync/core/design_system/base_scaffold.dart';
 import 'package:med_sync/core/navigation/app_navigator.dart';
 import 'package:med_sync/features/medications/models/medication.dart';
-import 'package:med_sync/features/medications/state/medication_controllers.dart';
+import 'package:med_sync/features/medications/state/add_medication_controller.dart';
 import 'package:med_sync/features/medications/views/medication_detail_screen.dart';
 import 'package:med_sync/features/medications/widgets/medication_form.dart';
 

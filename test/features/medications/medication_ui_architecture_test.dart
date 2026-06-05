@@ -11,7 +11,8 @@ void main() {
       'lib/features/medications/models/medication_form_state.dart',
       'lib/features/medications/data/medication_repository.dart',
       'lib/features/medications/data/firestore_medication_repository.dart',
-      'lib/features/medications/state/medication_controllers.dart',
+      'lib/features/medications/state/add_medication_controller.dart',
+      'lib/features/medications/state/medication_detail_screen_notifier.dart',
       'lib/features/medications/state/medication_form_validator.dart',
       'lib/features/medications/state/medication_providers.dart',
       'lib/features/medications/views/add_medication_screen.dart',
@@ -35,6 +36,18 @@ void main() {
 
     for (final path in deprecatedFolders) {
       expect(Directory(path).existsSync(), isFalse, reason: '$path is stale');
+    }
+
+    final deprecatedFiles = [
+      'lib/features/medications/state/medication_controllers.dart',
+    ];
+
+    for (final path in deprecatedFiles) {
+      expect(
+        File(path).existsSync(),
+        isFalse,
+        reason: '$path should be deleted',
+      );
     }
 
     final formSource = File(

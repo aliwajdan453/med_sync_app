@@ -1,0 +1,93 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function hasOptionalNumber(data, field) {
+      return !data.keys().hasAny([field]) ||
+        data[field] == null ||
+        data[field] is number;
+    }
+
+    function hasOptionalTimestamp(data, field) {
+      return !data.keys().hasAny([field]) ||
+        data[field] == null ||
+        data[field] is timestamp;
+    }
+
+    function hasValidSchedule(data) {
+      return data.routineType == 'asNeeded'
+        ? (!data.keys().hasAny(['schedule']) || data.schedule == null)
+        : data.schedule is map &&
+          data.schedule.pattern in ['daily', 'weekdays'] &&
+          data.schedule.weekdays is list &&
+          data.schedule.times is list &&
+          data.schedule.times.size() > 0 &&
+          (
+            data.schedule.pattern == 'daily' ||
+            data.schedule.weekdays.size() > 0
+          );
+    }
+
+    function hasValidRefill(data) {
+      return !data.keys().hasAny(['refillInfo']) ||
+        data.refillInfo == null ||
+        (
+          data.refillInfo is map &&
+          data.refillInfo.currentQuantity is number &&
+          data.refillInfo.currentQuantity > 0 &&
+          data.refillInfo.doseQuantity is number &&
+          data.refillInfo.doseQuantity > 0 &&
+          data.refillInfo.reminderThreshold is number &&
+          data.refillInfo.reminderThreshold > 0
+        );
+    }
+
+    function isValidMedication(data, userId) {
+      return data.ownerUid == userId &&
+        data.id is string &&
+        data.name is string &&
+        data.name.size() > 0 &&
+        data.category in ['prescription', 'otc', 'supplement'] &&
+        data.routineType in ['scheduled', 'asNeeded'] &&
+        data.status in ['active', 'archived'] &&
+        data.doseAmount is number &&
+        data.doseAmount > 0 &&
+        data.doseUnit is string &&
+        data.doseUnit.size() > 0 &&
+        data.instructions is string &&
+        data.instructions.size() > 0 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp &&
+        hasOptionalTimestamp(data, 'archivedAt') &&
+        hasOptionalTimestamp(data, 'deletedAt') &&
+        hasOptionalNumber(data, 'schemaVersion') &&
+        hasValidSchedule(data) &&
+        hasValidRefill(data);
+    }
+
+    match /users/{userId} {
+      allow read, create, update, delete: if isOwner(userId);
+
+      match /medications/{medicationId} {
+        allow read, delete: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+          isValidMedication(request.resource.data, userId);
+        allow update: if isOwner(userId) &&
+          resource.data.ownerUid == userId &&
+          isValidMedication(request.resource.data, userId);
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

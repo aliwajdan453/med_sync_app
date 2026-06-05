@@ -1,0 +1,34 @@
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "medsync-c9155",
+          "appId": "1:534586240620:android:3747f3daaa33c901f43249",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "medsync-c9155",
+          "appId": "1:534586240620:ios:fd871b9c1dddade2f43249",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "medsync-c9155",
+          "configurations": {
+            "android": "1:534586240620:android:3747f3daaa33c901f43249",
+            "ios": "1:534586240620:ios:fd871b9c1dddade2f43249"
+          }
+        }
+      }
+    }
+  }
+}

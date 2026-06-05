@@ -18,6 +18,10 @@ class FirestoreMedicationRepository implements MedicationRepository {
   CollectionReference<Json> _collection(String ownerUid) =>
       _firestore.collection('users').doc(ownerUid).collection('medications');
 
+  // ---------------------------------------------------------------------------
+  // Reads
+  // ---------------------------------------------------------------------------
+
   @override
   Stream<List<Medication>> watchActiveMedications(String ownerUid) =>
       _collection(ownerUid)
@@ -43,6 +47,10 @@ class FirestoreMedicationRepository implements MedicationRepository {
             : Medication.fromJson({'id': snapshot.id, ...data});
       });
 
+  // ---------------------------------------------------------------------------
+  // Writes
+  // ---------------------------------------------------------------------------
+
   @override
   Future<Medication> createMedication({
     required String ownerUid,
@@ -58,13 +66,16 @@ class FirestoreMedicationRepository implements MedicationRepository {
         createdAt: now,
         updatedAt: now,
       );
+
       _logger.info('Creating medication.', context: {
         'ownerUid': ownerUid,
         'medicationId': doc.id,
         'routineType': input.routineType.name,
         'category': input.category.name,
       });
+
       await doc.set(medication.toJson());
+
       return medication;
     } on BaseFailure {
       rethrow;
@@ -100,6 +111,7 @@ class FirestoreMedicationRepository implements MedicationRepository {
         'ownerUid': ownerUid,
         'medicationId': medicationId,
       });
+
       await _collection(ownerUid)
           .doc(medicationId)
           .set(updated.toJson(), SetOptions(merge: true));
@@ -123,6 +135,7 @@ class FirestoreMedicationRepository implements MedicationRepository {
         'ownerUid': ownerUid,
         'medicationId': medicationId,
       });
+
       await _collection(ownerUid).doc(medicationId).set(<String, Object?>{
         'status': MedicationStatus.archived.name,
         'archivedAt': FieldValue.serverTimestamp(),
@@ -146,6 +159,7 @@ class FirestoreMedicationRepository implements MedicationRepository {
         'ownerUid': ownerUid,
         'medicationId': medicationId,
       });
+
       await _collection(ownerUid).doc(medicationId).delete();
     } on Object catch (error, stackTrace) {
       _logger.error('Medication delete failed.',
@@ -154,6 +168,10 @@ class FirestoreMedicationRepository implements MedicationRepository {
       throw AppFailureMapper.map(error, stackTrace: stackTrace, logger: _logger);
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
 
   Medication _fromInput({
     required String id,

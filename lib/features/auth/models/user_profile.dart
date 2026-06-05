@@ -1,32 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:med_sync/core/converters/firestore_datetime_converter.dart';
 import 'package:med_sync/core/types.dart';
 
 part '../../../generated/features/auth/models/user_profile.freezed.dart';
 part '../../../generated/features/auth/models/user_profile.g.dart';
 
 enum DeleteReauthMode { password, provider }
-
-class FirestoreDateTimeConverter implements JsonConverter<DateTime, Object?> {
-  const FirestoreDateTimeConverter();
-
-  @override
-  DateTime fromJson(Object? json) {
-    if (json is Timestamp) {
-      return json.toDate();
-    }
-    if (json is String) {
-      return DateTime.parse(json);
-    }
-    if (json is DateTime) {
-      return json;
-    }
-    return DateTime.fromMillisecondsSinceEpoch(0);
-  }
-
-  @override
-  Object toJson(DateTime object) => Timestamp.fromDate(object);
-}
 
 @freezed
 abstract class UserProfile with _$UserProfile {

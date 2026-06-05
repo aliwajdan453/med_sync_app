@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:med_sync/core/converters/firestore_datetime_converter.dart';
 import 'package:med_sync/core/types.dart';
 
 part '../../../generated/features/medications/models/medication.freezed.dart';
@@ -65,12 +66,12 @@ abstract class Medication with _$Medication {
     required double doseAmount,
     required String doseUnit,
     required String instructions,
-    required DateTime createdAt,
-    required DateTime updatedAt,
+    @FirestoreDateTimeConverter() required DateTime createdAt,
+    @FirestoreDateTimeConverter() required DateTime updatedAt,
     MedicationSchedule? schedule,
     RefillInfo? refillInfo,
-    DateTime? archivedAt,
-    DateTime? deletedAt,
+    @NullableFirestoreDateTimeConverter() DateTime? archivedAt,
+    @NullableFirestoreDateTimeConverter() DateTime? deletedAt,
   }) = _Medication;
 
   factory Medication.fromJson(Json json) => _$MedicationFromJson(json);

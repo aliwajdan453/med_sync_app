@@ -26,7 +26,7 @@ class FirestoreMedicationRepository implements MedicationRepository {
           .map(
             (snapshot) => sortMedicationsNewestFirst(
               snapshot.docs
-                  .map((doc) => Medication.fromJson(_decodeDocument(doc)))
+                  .map((doc) => Medication.fromJson({'id': doc.id, ...doc.data()}))
                   .toList(growable: false),
             ),
           );
@@ -37,10 +37,9 @@ class FirestoreMedicationRepository implements MedicationRepository {
     required String medicationId,
   }) => _collection(ownerUid).doc(medicationId).snapshots().map((snapshot) {
     final data = snapshot.data();
-
     return data == null
         ? null
-        : Medication.fromJson(_decodeMap(snapshot.id, data));
+        : Medication.fromJson({'id': snapshot.id, ...data});
   });
 
   @override
@@ -68,7 +67,7 @@ class FirestoreMedicationRepository implements MedicationRepository {
         createdAt: now,
         updatedAt: now,
       );
-      await doc.set(_encodeMedication(medication));
+      await doc.set(medication.toJson());
       _logger.info(
         'Medication document created.',
         context: <String, Object?>{
@@ -107,7 +106,7 @@ class FirestoreMedicationRepository implements MedicationRepository {
       if (data == null) {
         throw MedicationFailures.missingMedication();
       }
-      final current = Medication.fromJson(_decodeMap(existing.id, data));
+      final current = Medication.fromJson({'id': existing.id, ...data});
       final updated = _fromInput(
         id: medicationId,
         ownerUid: ownerUid,
@@ -124,7 +123,7 @@ class FirestoreMedicationRepository implements MedicationRepository {
           'path': doc.path,
         },
       );
-      await doc.set(_encodeMedication(updated), SetOptions(merge: true));
+      await doc.set(updated.toJson(), SetOptions(merge: true));
     } on BaseFailure {
       rethrow;
     } on Object catch (error, stackTrace) {
@@ -241,53 +240,10 @@ class FirestoreMedicationRepository implements MedicationRepository {
     createdAt: createdAt,
     updatedAt: updatedAt,
   );
-
-  Map<String, Object?> _encodeMedication(Medication medication) {
-    final json = medication.toJson();
-    return json.map((key, value) => MapEntry(key, _encodeValue(value)));
-  }
-
-  Object? _encodeValue(Object? value) {
-    if (value is DateTime) {
-      return Timestamp.fromDate(value);
-    }
-    if (value is Map<String, Object?>) {
-      return value.map((key, nested) => MapEntry(key, _encodeValue(nested)));
-    }
-    if (value is List<Object?>) {
-      return value.map(_encodeValue).toList(growable: false);
-    }
-    return value;
-  }
-
-  Json _decodeDocument(QueryDocumentSnapshot<Json> doc) =>
-      _decodeMap(doc.id, doc.data());
-
-  Json _decodeMap(String id, Json data) {
-    final decoded = data.map(
-      (key, value) => MapEntry(key, _decodeValue(value)),
-    );
-    decoded['id'] = id;
-    return decoded;
-  }
-
-  Object? _decodeValue(Object? value) {
-    if (value is Timestamp) {
-      return value.toDate().toIso8601String();
-    }
-    if (value is Json) {
-      return value.map((key, nested) => MapEntry(key, _decodeValue(nested)));
-    }
-    if (value is List<Object?>) {
-      return value.map(_decodeValue).toList(growable: false);
-    }
-    return value;
-  }
 }
 
 List<Medication> sortMedicationsNewestFirst(List<Medication> medications) {
   final sorted = [...medications];
-
   return sorted
     ..sort((left, right) => right.createdAt.compareTo(left.createdAt));
 }

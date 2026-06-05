@@ -21,7 +21,7 @@ class FirebaseAuthRepository implements AuthRepository {
   static Future<void>? _googleInitializeFuture;
 
   @override
-  Stream<User?> authStateChanges() => _auth.userChanges();
+  Stream<User?> authStateChanges() => _auth.authStateChanges();
 
   @override
   User? get currentUser => _auth.currentUser;

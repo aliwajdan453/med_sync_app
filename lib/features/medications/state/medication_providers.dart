@@ -17,10 +17,12 @@ MedicationRepository medicationRepository(Ref ref) =>
 @riverpod
 Stream<List<Medication>> medicationList(Ref ref) async* {
   final user = await ref.watch(currentUserProvider.future);
+
   if (user == null) {
     yield const <Medication>[];
     return;
   }
+
   yield* ref
       .read(medicationRepositoryProvider)
       .watchActiveMedications(user.uid);
@@ -29,10 +31,12 @@ Stream<List<Medication>> medicationList(Ref ref) async* {
 @riverpod
 Stream<Medication?> medicationDetail(Ref ref, String medicationId) async* {
   final user = await ref.watch(currentUserProvider.future);
+
   if (user == null) {
     yield null;
     return;
   }
+
   yield* ref
       .read(medicationRepositoryProvider)
       .watchMedication(ownerUid: user.uid, medicationId: medicationId);

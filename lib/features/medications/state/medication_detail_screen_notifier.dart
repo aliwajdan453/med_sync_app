@@ -69,7 +69,6 @@ class MedicationDetailScreenNotifier
             medicationId: medicationId,
             input: input,
           );
-      ref.invalidate(medicationListProvider);
     }, onSuccess: (current) => current.copyWith(isEditing: false));
   }
 
@@ -78,7 +77,6 @@ class MedicationDetailScreenNotifier
     await ref
         .read(medicationRepositoryProvider)
         .archiveMedication(ownerUid: ownerUid, medicationId: medicationId);
-    ref.invalidate(medicationListProvider);
   });
 
   Future<bool> permanentlyDelete() => _submit(() async {
@@ -89,7 +87,6 @@ class MedicationDetailScreenNotifier
           ownerUid: ownerUid,
           medicationId: medicationId,
         );
-    ref.invalidate(medicationListProvider);
   }, onSuccess: (current) => current.copyWith(didCompleteDelete: true));
 
   Future<bool> _submit(

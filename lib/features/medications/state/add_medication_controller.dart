@@ -37,7 +37,6 @@ class AddMedicationController extends _$AddMedicationController {
           .read(medicationRepositoryProvider)
           .createMedication(ownerUid: ownerUid, input: input);
       if (!ref.mounted) return null;
-      ref.invalidate(medicationListProvider);
       state = state.copyWith(isSubmitting: false, failure: null);
       return medication.id;
     } on Object catch (error, stackTrace) {

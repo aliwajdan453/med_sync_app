@@ -52,6 +52,7 @@ class HomeScreen extends ConsumerWidget {
               overflow: TextOverflow.ellipsis,
               style: textTheme.bodyLarge?.copyWith(
                 color: AppColors.slateLabel,
+                fontWeight: FontWeight.normal,
                 height: 1.45,
               ),
             ),
@@ -109,6 +110,8 @@ class _TodaySummary extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: textTheme.bodyMedium?.copyWith(
                   color: AppColors.slateLabel,
+                  fontWeight: FontWeight.normal,
+                  height: 1.45,
                 ),
               )
             else ...[
@@ -140,7 +143,11 @@ class _StatusRow extends StatelessWidget {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: textTheme.bodyMedium?.copyWith(color: AppColors.slateLabel),
+            style: textTheme.bodyMedium?.copyWith(
+              color: AppColors.slateLabel,
+              fontWeight: FontWeight.normal,
+              height: 1.45,
+            ),
           ),
         ),
         Text(
@@ -148,6 +155,7 @@ class _StatusRow extends StatelessWidget {
           style: textTheme.bodyMedium?.copyWith(
             color: AppColors.dataTeal,
             fontWeight: FontWeight.w800,
+            height: 1.45,
           ),
         ),
       ],

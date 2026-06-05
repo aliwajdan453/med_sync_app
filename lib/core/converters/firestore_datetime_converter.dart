@@ -8,7 +8,7 @@ class FirestoreDateTimeConverter implements JsonConverter<DateTime, Object?> {
   @override
   DateTime fromJson(Object? json) {
     if (json is Timestamp) return json.toDate();
-    if (json is String) return DateTime.parse(json);
+    if (json is String) return DateTime.tryParse(json) ?? DateTime.fromMillisecondsSinceEpoch(0);
     if (json is DateTime) return json;
     return DateTime.fromMillisecondsSinceEpoch(0);
   }
@@ -26,7 +26,7 @@ class NullableFirestoreDateTimeConverter
   DateTime? fromJson(Object? json) {
     if (json == null) return null;
     if (json is Timestamp) return json.toDate();
-    if (json is String) return DateTime.parse(json);
+    if (json is String) return DateTime.tryParse(json);
     if (json is DateTime) return json;
     return null;
   }
